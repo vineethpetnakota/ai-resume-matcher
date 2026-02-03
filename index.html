@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Matcher - ATS Optimization Tool</title>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel Standalone for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <!-- Mammoth.js for DOCX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: linear-gradient(to bottom right, #eff6ff, #e0e7ff);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1152px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-icon {
+            width: 2rem;
+            height: 2rem;
+            color: #4f46e5;
+        }
+
+        .title {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .subtitle {
+            color: #4b5563;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .badge {
+            display: inline-block;
+            margin-left: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: #dbeafe;
+            color: #1e40af;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 9999px;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .label {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .upload-area {
+            border: 2px dashed #a5b4fc;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            background: #eef2ff;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background: #e0e7ff;
+        }
+
+        .upload-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .upload-icon {
+            width: 3rem;
+            height: 3rem;
+            color: #4f46e5;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-text {
+            color: #4338ca;
+            font-weight: 500;
+        }
+
+        .upload-subtext {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .resume-list {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .resume-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9fafb;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .resume-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #4b5563;
+        }
+
+        .resume-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .btn-remove {
+            color: #dc2626;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .btn-remove:hover {
+            color: #991b1b;
+        }
+
+        .btn-clear-all {
+            color: #dc2626;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border: 1px solid #fca5a5;
+            border-radius: 0.5rem;
+            background: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-clear-all:hover {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .textarea {
+            width: 100%;
+            height: 12rem;
+            padding: 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+            resize: none;
+            outline: none;
+        }
+
+        .textarea:focus {
+            border-color: #4f46e5;
+        }
+
+        .btn-analyze {
+            width: 100%;
+            background: #4f46e5;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .btn-analyze:hover:not(:disabled) {
+            background: #4338ca;
+        }
+
+        .btn-analyze:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .btn-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .spinner {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid white;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .results-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .check-icon {
+            width: 1.75rem;
+            height: 1.75rem;
+            color: #16a34a;
+        }
+
+        .best-match-box {
+            background: linear-gradient(to right, #f0fdf4, #dcfce7);
+            border: 2px solid #86efac;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .best-match-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .best-match-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #166534;
+        }
+
+        .best-match-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #14532d;
+            margin-bottom: 0.25rem;
+        }
+
+        .best-match-score {
+            font-size: 1.125rem;
+            color: #15803d;
+        }
+
+        .analysis-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .analysis-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            background: #f9fafb;
+        }
+
+        .analysis-card.best {
+            border-color: #86efac;
+            background: #f0fdf4;
+        }
+
+        .analysis-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .analysis-name {
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .score-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 2px solid;
+            font-weight: bold;
+        }
+
+        .score-green {
+            color: #16a34a;
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .score-yellow {
+            color: #ca8a04;
+            background: #fefce8;
+            border-color: #fde047;
+        }
+
+        .score-red {
+            color: #dc2626;
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .keyword-section {
+            margin-bottom: 1rem;
+        }
+
+        .keyword-header {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .keyword-icon {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .keyword-icon-green { color: #16a34a; }
+        .keyword-icon-blue { color: #2563eb; }
+        .keyword-icon-red { color: #dc2626; }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .tag-green {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .tag-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .tag-red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .recommendation-box {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-text {
+            color: #4b5563;
+            line-height: 1.5;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { Upload, FileText, Briefcase, CheckCircle, AlertCircle, TrendingUp } = lucide;
+
+        function ResumeMatcherApp() {
+          const [resumes, setResumes] = useState([]);
+          const [jobDescription, setJobDescription] = useState('');
+          const [analysis, setAnalysis] = useState(null);
+          const [loading, setLoading] = useState(false);
+
+          // Load saved resumes from localStorage on mount
+          useEffect(() => {
+            try {
+              const savedResumes = localStorage.getItem('savedResumes');
+              if (savedResumes) {
+                const parsed = JSON.parse(savedResumes);
+                setResumes(parsed);
+                console.log('Loaded resumes from storage:', parsed.length);
+              }
+            } catch (error) {
+              console.error('Error loading saved resumes:', error);
+            }
+          }, []);
+
+          // Save resumes to localStorage whenever they change
+          useEffect(() => {
+            if (resumes.length > 0) {
+              try {
+                localStorage.setItem('savedResumes', JSON.stringify(resumes));
+                console.log('Saved resumes to storage:', resumes.length);
+              } catch (error) {
+                console.error('Error saving resumes:', error);
+                alert('Failed to save resumes. Storage might be full.');
+              }
+            }
+          }, [resumes]);
+
+          const extractTextFromPDF = async (file) => {
+            const pdfjsLib = window['pdfjs-dist/build/pdf'];
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const textContent = await page.getTextContent();
+              const pageText = textContent.items.map(item => item.str).join(' ');
+              fullText += pageText + '\n';
+            }
+
+            return fullText;
+          };
+
+          const extractTextFromDOCX = async (file) => {
+            const mammoth = window.mammoth;
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.extractRawText({ arrayBuffer });
+            return result.value;
+          };
+
+          const handleResumeUpload = async (e) => {
+            const files = Array.from(e.target.files);
+            const newResumes = [];
+
+            for (const file of files) {
+              let text = '';
+              const fileExtension = file.name.split('.').pop().toLowerCase();
+
+              try {
+                if (fileExtension === 'pdf') {
+                  text = await extractTextFromPDF(file);
+                } else if (fileExtension === 'docx') {
+                  text = await extractTextFromDOCX(file);
+                } else if (fileExtension === 'txt' || fileExtension === 'md') {
+                  text = await file.text();
+                } else {
+                  alert(`Unsupported file type: ${file.name}`);
+                  continue;
+                }
+
+                newResumes.push({
+                  name: file.name,
+                  content: text,
+                  id: Date.now() + Math.random()
+                });
+              } catch (error) {
+                console.error(`Error processing ${file.name}:`, error);
+                alert(`Failed to process ${file.name}. Please try again.`);
+              }
+            }
+
+            setResumes([...resumes, ...newResumes]);
+          };
+
+          const analyzeResumes = async () => {
+            if (resumes.length === 0 || !jobDescription.trim()) {
+              alert('Please upload at least one resume and enter a job description');
+              return;
+            }
+
+            setLoading(true);
+            
+            try {
+              console.log('Starting analysis...');
+              const response = await fetch('/.netlify/functions/analyze', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  resumes: resumes,
+                  jobDescription: jobDescription
+                })
+              });
+
+              if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API Error:', errorText);
+                throw new Error(`API request failed: ${response.status}`);
+              }
+
+              const data = await response.json();
+              console.log('API Response:', data);
+
+              // Gemini function returns analysis directly
+              if (data.error) {
+                throw new Error(data.error);
+              }
+              
+              console.log('Parsed analysis:', data);
+              setAnalysis(data);
+            } catch (error) {
+              console.error('Analysis error:', error);
+              alert(`Error analyzing resumes: ${error.message}\n\nPlease check the browser console for more details.`);
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          const removeResume = (id) => {
+            setResumes(resumes.filter(r => r.id !== id));
+            setAnalysis(null);
+          };
+
+          const clearAllResumes = () => {
+            if (confirm('Are you sure you want to delete all saved resumes? This cannot be undone.')) {
+              setResumes([]);
+              localStorage.removeItem('savedResumes');
+              setAnalysis(null);
+              alert('All resumes have been cleared!');
+            }
+          };
+
+          const getScoreClass = (score) => {
+            if (score >= 80) return 'score-green';
+            if (score >= 60) return 'score-yellow';
+            return 'score-red';
+          };
+
+          return (
+            <div className="container">
+              <div className="card">
+                <div className="header">
+                  <Briefcase className="header-icon" />
+                  <h1 className="title">AI Resume Matcher</h1>
+                </div>
+                <p className="subtitle">
+                  Upload your resumes and paste the job description. Our AI will analyze and recommend the best resume for ATS optimization.
+                  {resumes.length > 0 && (
+                    <span className="badge">
+                      {resumes.length} resume{resumes.length !== 1 ? 's' : ''} saved
+                    </span>
+                  )}
+                </p>
+
+                <div className="section">
+                  <div className="section-header">
+                    <label className="label">
+                      Upload Resumes (.pdf, .docx, .txt, .md)
+                    </label>
+                    {resumes.length > 0 && (
+                      <button onClick={clearAllResumes} className="btn-clear-all">
+                        Clear All Resumes
+                      </button>
+                    )}
+                  </div>
+                  <div className="upload-area">
+                    <input
+                      type="file"
+                      multiple
+                      accept=".txt,.md,.pdf,.docx"
+                      onChange={handleResumeUpload}
+                      id="resume-upload"
+                    />
+                    <label htmlFor="resume-upload" className="upload-content">
+                      <Upload className="upload-icon" />
+                      <span className="upload-text">Click to upload resumes</span>
+                      <span className="upload-subtext">Support for PDF, DOCX, TXT, and MD files</span>
+                    </label>
+                  </div>
+
+                  {resumes.length > 0 && (
+                    <div className="resume-list">
+                      {resumes.map((resume) => (
+                        <div key={resume.id} className="resume-item">
+                          <div className="resume-info">
+                            <FileText className="file-icon" />
+                            <span className="resume-name">{resume.name}</span>
+                          </div>
+                          <button onClick={() => removeResume(resume.id)} className="btn-remove">
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="section">
+                  <label className="label">Job Description</label>
+                  <textarea
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    placeholder="Paste the job description here..."
+                    className="textarea"
+                  />
+                </div>
+
+                <button
+                  onClick={analyzeResumes}
+                  disabled={loading || resumes.length === 0 || !jobDescription.trim()}
+                  className="btn-analyze"
+                >
+                  {loading ? (
+                    <>
+                      <div className="spinner"></div>
+                      Analyzing Resumes...
+                    </>
+                  ) : (
+                    <>
+                      <TrendingUp className="btn-icon" />
+                      Analyze & Match Resumes
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {analysis && (
+                <div className="results-section">
+                  <h2 className="results-header">
+                    <CheckCircle className="check-icon" />
+                    Analysis Results
+                  </h2>
+
+                  <div className="best-match-box">
+                    <div className="best-match-header">
+                      <CheckCircle className="check-icon" />
+                      <h3 className="best-match-title">Recommended Resume</h3>
+                    </div>
+                    <p className="best-match-name">{analysis.best_match.resume_name}</p>
+                    <p className="best-match-score">
+                      Match Score: <strong>{analysis.best_match.score}%</strong>
+                    </p>
+                  </div>
+
+                  <div className="analysis-list">
+                    {analysis.detailed_analysis.map((resume, index) => (
+                      <div
+                        key={index}
+                        className={`analysis-card ${resume.resume_name === analysis.best_match.resume_name ? 'best' : ''}`}
+                      >
+                        <div className="analysis-header">
+                          <h4 className="analysis-name">{resume.resume_name}</h4>
+                          <div className={`score-badge ${getScoreClass(resume.score)}`}>
+                            {resume.score}% Match
+                          </div>
+                        </div>
+
+                        <div className="grid">
+                          <div className="keyword-section">
+                            <h5 className="keyword-header">
+                              <CheckCircle className="keyword-icon keyword-icon-green" />
+                              Matching Keywords
+                            </h5>
+                            <div className="tag-list">
+                              {resume.matching_keywords.map((kw, i) => (
+                                <span key={i} className="tag tag-green">{kw}</span>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="keyword-section">
+                            <h5 className="keyword-header">
+                              <CheckCircle className="keyword-icon keyword-icon-blue" />
+                              Matching Technologies
+                            </h5>
+                            <div className="tag-list">
+                              {resume.matching_technologies.map((tech, i) => (
+                                <span key={i} className="tag tag-blue">{tech}</span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {resume.missing_keywords.length > 0 && (
+                          <div className="keyword-section">
+                            <h5 className="keyword-header">
+                              <AlertCircle className="keyword-icon keyword-icon-red" />
+                              Missing Critical Keywords
+                            </h5>
+                            <div className="tag-list">
+                              {resume.missing_keywords.map((kw, i) => (
+                                <span key={i} className="tag tag-red">{kw}</span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="recommendation-box">
+                          <h5 className="recommendation-title">Recommendation</h5>
+                          <p className="recommendation-text">{resume.recommendation}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        lucide.createIcons();
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ResumeMatcherApp />);
+    </script>
+</body>
+</html>
