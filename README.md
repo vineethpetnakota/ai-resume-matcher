@@ -1,7 +1,3 @@
-This is a fantastic milestone! Your app is now live on a professional-grade platform.
-
-Here is your **final, completed `README.md**`. I have specifically tailored it to your new Vercel URL and included sections that make this look like a high-quality portfolio piece for recruiters.
-
 ### `README.md`
 
 ```markdown
@@ -77,11 +73,16 @@ This project is optimized for **Vercel**:
 
 ---
 
+## 📝 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
 ## 👤 Author
 
 **Your Name**
 
 * **Website:** [https://ai-resume-matcher-lovat.vercel.app](https://ai-resume-matcher-lovat.vercel.app)
-* **GitHub:** [@vineethpetnakota](https://github.com/vineethpetnakota)
+* **GitHub:** [@yourusername](https://github.com/yourusername)
 
-```
