@@ -1,16 +1,8 @@
 # 🚀 Gemini Resume Matcher - Setup Guide
 
-## Why Gemini?
-
-✅ **Completely FREE** - No credit card required  
-✅ **Generous limits** - 60 requests/minute  
-✅ **No trial period** - Free tier is permanent  
-✅ **Fast & accurate** - Perfect for resume analysis  
-✅ **2-minute setup** - Easiest of all APIs  
-
 ---
 
-## Step 1: Get Your Free Gemini API Key (2 minutes)
+## Step 1: Get Your Free Gemini API Key 
 
 1. Go to: **https://aistudio.google.com**
 2. Click "Get API key" (top right)
@@ -19,13 +11,11 @@
 5. Copy your API key
 6. Save it somewhere safe
 
-**That's it!** No credit card, no phone verification, no trial period.
-
 ---
 
 ## Step 2: Deploy to Netlify
 
-### Option A: Via GitHub (Recommended)
+### Option A: Via GitHub 
 
 1. **Push this folder to GitHub:**
    ```bash
@@ -87,7 +77,7 @@ netlify env:set GEMINI_API_KEY "your-api-key-here"
 
 ## Step 3: Test Your App
 
-Your app should now be live at: `https://your-site-name.netlify.app`
+ App should now be live at: `https://your-site-name.netlify.app`
 
 ### Test checklist:
 - [ ] Upload a PDF resume
@@ -99,16 +89,8 @@ Your app should now be live at: `https://your-site-name.netlify.app`
 
 ---
 
-## 🎉 You're Done!
 
-**Cost:** $0 (completely free!)  
-**Time to setup:** 5 minutes  
-**Monthly analyses:** Unlimited for personal use  
-**Quality:** Excellent for resume matching  
-
----
-
-## 💡 Tips & Tricks
+## 💡 Points to be noted
 
 ### Customize your site name
 1. In Netlify: "Site configuration" → "Change site name"
@@ -116,13 +98,6 @@ Your app should now be live at: `https://your-site-name.netlify.app`
 
 ### Monitor usage
 Check your Gemini API usage at: https://aistudio.google.com/apikey
-
-### If you hit rate limits
-Free tier allows 60 requests/minute. If you need more:
-- Wait a minute and try again
-- Or create multiple API keys and rotate them
-- Or upgrade to paid tier (very cheap: $0.35 per million tokens)
-
 ---
 
 ## 🐛 Troubleshooting
@@ -146,38 +121,7 @@ Free tier allows 60 requests/minute. If you need more:
 → Try smaller files first  
 → Make sure files are PDF, DOCX, TXT, or MD
 
----
 
-## 📊 Gemini vs Claude Comparison
-
-| Feature | Gemini | Claude |
-|---------|--------|--------|
-| Free tier | Permanent | 14 days |
-| Requests/min | 60 | ~50 |
-| Credit card | ❌ Not needed | ❌ Not needed |
-| Phone verification | ❌ Not needed | ✅ Required |
-| Setup time | 2 minutes | 5 minutes |
-| Quality | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Best for | Long-term free use | Trial/testing |
-
----
-
-## 🔄 Switching from Claude to Gemini
-
-Already have the Claude version running? Here's how to switch:
-
-1. Get Gemini API key (2 minutes)
-2. Replace your repo with this `gemini-resume-matcher` folder
-3. Push to GitHub
-4. In Netlify:
-   - Remove `CLAUDE_API_KEY` variable (optional)
-   - Add `GEMINI_API_KEY` variable
-5. Redeploy
-6. Done!
-
-Everything else stays the same - same UI, same features, just a different (free!) backend.
-
----
 
 ## 📈 What's Next?
 
@@ -208,12 +152,6 @@ A: Yes! The free tier is permanent, not a trial.
 **Q: How many resumes can I analyze?**  
 A: 60 per minute = 3,600 per hour = effectively unlimited for personal use.
 
-**Q: Is Gemini as good as Claude?**  
-A: For resume matching, yes! Both are excellent. Gemini is faster and has better free tier.
-
-**Q: Can I use both Gemini and Claude?**  
-A: Yes! Create both functions and switch between them.
-
 **Q: What if I need more than free tier?**  
 A: Paid tier is very cheap: $0.35 per million tokens (way cheaper than Claude).
 
@@ -228,6 +166,3 @@ A: Yes, but consider upgrading to paid tier for higher volume.
 - Netlify Docs: https://docs.netlify.com
 - Can't get it working? Let me know the error and I'll help!
 
----
-
-**Congrats on getting your app working with a completely free API! 🎉**
