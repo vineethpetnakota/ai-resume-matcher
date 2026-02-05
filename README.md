@@ -1,168 +1,87 @@
-# 🚀 Gemini Resume Matcher - Setup Guide
+This is a fantastic milestone! Your app is now live on a professional-grade platform.
+
+Here is your **final, completed `README.md**`. I have specifically tailored it to your new Vercel URL and included sections that make this look like a high-quality portfolio piece for recruiters.
+
+### `README.md`
+
+```markdown
+# 🎯 AI Resume Matcher & ATS Optimizer
+**Live Demo:** [https://ai-resume-matcher-lovat.vercel.app](https://ai-resume-matcher-lovat.vercel.app)
+
+An intelligent, full-stack application designed to help job seekers bypass "The Black Hole" of Applicant Tracking Systems (ATS). This tool analyzes multiple resumes against a job description using Google's **Gemini 1.5 Flash AI** to provide instant feedback on keyword gaps and matching scores.
 
 ---
 
-## Step 1: Get Your Free Gemini API Key 
-
-1. Go to: **https://aistudio.google.com**
-2. Click "Get API key" (top right)
-3. Click "Create API key"
-4. Select a Google Cloud project (or create new one)
-5. Copy your API key
-6. Save it somewhere safe
+## 🚀 How It Works
+1. **Input:** Paste any Job Description (JD) into the text area.
+2. **Upload:** Drop one or multiple resumes (.pdf or .docx).
+3. **Analyze:** The frontend extracts text from your documents and sends it to a Vercel Serverless Function.
+4. **Result:** The AI identifies matching skills, critical missing keywords, and gives a percentage match score with specific advice on how to improve the resume.
 
 ---
 
-## Step 2: Deploy to Netlify
+## ✨ Key Features
+- **Zero-Dependency UI:** Built with a "safe" React implementation to ensure 100% uptime and fast loading.
+- **Privacy First:** Document parsing happens locally in your browser (using PDF.js and Mammoth.js).
+- **Multi-Resume Support:** Compare different versions of your resume to see which one performs better for a specific role.
+- **ATS Keyword Extraction:** Specifically looks for hard skills, frameworks, and certifications.
+- **Serverless Architecture:** Powered by Vercel Functions for scalable, cost-effective backend execution.
 
-### Option A: Via GitHub 
+---
 
-1. **Push this folder to GitHub:**
-   ```bash
-   cd gemini-resume-matcher
-   git init
-   git add .
-   git commit -m "Initial commit - Gemini Resume Matcher"
-   git remote add origin https://github.com/YOUR-USERNAME/resume-matcher.git
-   git branch -M main
-   git push -u origin main
-   ```
+## 🛠️ Technical Architecture
 
-2. **Deploy on Netlify:**
-   - Go to https://app.netlify.com
-   - Click "Add new site" → "Import an existing project"
-   - Choose "GitHub"
-   - Select your repository
-   - Click "Deploy site"
+### Frontend
+- **Framework:** React 18 (CDN hosted for performance)
+- **Document Parsing:** - `PDF.js` for high-accuracy PDF text extraction.
+  - `Mammoth.js` for Word document (.docx) processing.
+- **Transpiler:** Babel Standalone.
 
-3. **Add your API key:**
-   - In Netlify dashboard: "Site configuration" → "Environment variables"
-   - Click "Add a variable"
-   - Key: `GEMINI_API_KEY`
-   - Value: Paste your API key
-   - Click "Create variable"
+### Backend (Vercel Functions)
+- **Runtime:** Node.js
+- **AI Integration:** `@google/generative-ai` (Gemini 1.5 Flash).
+- **Endpoint:** `/api/analyze` - A secure serverless endpoint that keeps API keys hidden from the client.
 
-4. **Redeploy:**
-   - Go to "Deploys" tab
-   - Click "Trigger deploy" → "Deploy site"
-   - Wait 1-2 minutes
+---
 
-5. **Test your app:**
-   - Click on your site URL
-   - Upload a resume
-   - Paste a job description
-   - Click "Analyze & Match Resumes"
-   - ✅ It works!
+## 📂 Project Structure
+```text
+├── api/
+│   └── analyze.js       # Backend AI logic (Vercel Serverless Function)
+├── index.html           # Main Application UI & Frontend Logic
+├── package.json         # Backend dependencies & Node settings
+├── .gitignore           # Security: Prevents leaking API keys/node_modules
+└── README.md            # You are here!
 
-### Option B: Via Netlify CLI
-
-```bash
-# Install Netlify CLI
-npm install -g netlify-cli
-
-# Navigate to folder
-cd gemini-resume-matcher
-
-# Login
-netlify login
-
-# Deploy
-netlify deploy --prod
-
-# Add environment variable (or use dashboard)
-netlify env:set GEMINI_API_KEY "your-api-key-here"
 ```
 
 ---
 
-## Step 3: Test Your App
+## 🛠️ Setup & Deployment
 
- App should now be live at: `https://your-site-name.netlify.app`
+### Local Development
 
-### Test checklist:
-- [ ] Upload a PDF resume
-- [ ] Upload a DOCX resume
-- [ ] Paste a job description
-- [ ] Click "Analyze & Match"
-- [ ] See results within 5-10 seconds
-- [ ] Check match scores and keywords
+1. Clone the repository.
+2. Install dependencies: `npm install`.
+3. Create a `.env` file and add: `GEMINI_API_KEY=your_key_here`.
+4. Use Vercel CLI to run locally: `vercel dev`.
 
----
+### Deployment
 
+This project is optimized for **Vercel**:
 
-## 💡 Points to be noted
-
-### Customize your site name
-1. In Netlify: "Site configuration" → "Change site name"
-2. Pick: `your-name-resume-matcher.netlify.app`
-
-### Monitor usage
-Check your Gemini API usage at: https://aistudio.google.com/apikey
----
-
-## 🐛 Troubleshooting
-
-### "Function returned undefined"
-→ Make sure you added `GEMINI_API_KEY` environment variable  
-→ Redeploy after adding variables
-
-### "API key not valid"
-→ Check you copied the entire key  
-→ Make sure it's from AI Studio (not Cloud Console)  
-→ Key should start with: `AIza...`
-
-### "Rate limit exceeded"
-→ You're making more than 60 requests/minute  
-→ Wait 60 seconds and try again  
-→ This shouldn't happen with normal use
-
-### Files not uploading
-→ Check browser console (F12) for errors  
-→ Try smaller files first  
-→ Make sure files are PDF, DOCX, TXT, or MD
-
-
-
-## 📈 What's Next?
-
-### Share your app
-Your app is now publicly accessible! Share the link with:
-- Friends job hunting
-- Career counselors
-- LinkedIn connections
-- Your portfolio
-
-### Monitor costs
-Even though it's free, you can track usage at:
-https://aistudio.google.com/apikey
-
-### Add custom domain (optional)
-1. Buy a domain (e.g., resumematcher.com)
-2. In Netlify: "Domain management" → "Add custom domain"
-3. Update DNS settings
-4. Get free SSL automatically
+1. Push code to GitHub.
+2. Connect GitHub repo to Vercel.
+3. Add `GEMINI_API_KEY` to **Project Settings > Environment Variables**.
+4. The app will automatically deploy on every push.
 
 ---
 
-## ❓ FAQ
+## 👤 Author
 
-**Q: Is Gemini really free forever?**  
-A: Yes! The free tier is permanent, not a trial.
+**Your Name**
 
-**Q: How many resumes can I analyze?**  
-A: 60 per minute = 3,600 per hour = effectively unlimited for personal use.
+* **Website:** [https://ai-resume-matcher-lovat.vercel.app](https://ai-resume-matcher-lovat.vercel.app)
+* **GitHub:** [@vineethpetnakota](https://github.com/vineethpetnakota)
 
-**Q: What if I need more than free tier?**  
-A: Paid tier is very cheap: $0.35 per million tokens (way cheaper than Claude).
-
-**Q: Can I use this commercially?**  
-A: Yes, but consider upgrading to paid tier for higher volume.
-
----
-
-## 🆘 Need Help?
-
-- Gemini API Docs: https://ai.google.dev/docs
-- Netlify Docs: https://docs.netlify.com
-- Can't get it working? Let me know the error and I'll help!
-
+```
