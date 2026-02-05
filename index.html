@@ -72,7 +72,7 @@
             const runAnalysis = async () => {
                 setLoading(true);
                 try {
-                    const res = await fetch('/.netlify/functions/analyze', {
+                    const res = await fetch('/api/analyze', {
                         method: 'POST',
                         body: JSON.stringify({ resumes, jobDescription: jd })
                     });
