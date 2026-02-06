@@ -1,97 +1,58 @@
-# AI Resume Matcher & ATS Optimizer
+# 🎯 ResumeAI | AI-Powered ATS Optimizer
 
-🔗 **Live Demo:** https://ai-resume-matcher-lovat.vercel.app
+**Live Demo:** [https://ai-resume-matcher-lovat.vercel.app](https://ai-resume-matcher-lovat.vercel.app)
 
-A full-stack web application that analyzes resumes against a job description to estimate ATS compatibility. It uses Google Gemini 1.5 Flash to identify keyword gaps, matching skills, and generate a relevance score to help job seekers choose the best resume for a specific role.
-
----
-
-## Problem Statement
-
-Applicant Tracking Systems (ATS) filter resumes before they ever reach recruiters. Many qualified candidates are rejected due to missing keywords or poor alignment with job descriptions.
-
-This project helps address that problem by:
-- Comparing multiple resumes against a single job description
-- Highlighting missing ATS keywords
-- Ranking resumes based on match score and skill relevance
+ResumeAI is a high-performance, full-stack application designed to help job seekers bridge the gap between their experience and Applicant Tracking Systems (ATS). Using advanced **Generative AI**, the tool provides a deep-dive analysis of how well your resume matches a specific job description.
 
 ---
 
-## How It Works
+## 🚀 How to Use
 
-1. Paste a Job Description into the input field  
-2. Upload one or more resumes (`.pdf` or `.docx`)  
-3. Resume text is extracted locally in the browser  
-4. Extracted text and the job description are sent to a serverless API  
-5. The AI returns:
-   - Match percentage  
-   - Matching skills  
-   - Missing or weak keywords  
-   - Resume improvement suggestions  
+1. **Paste** the Job Description into the analyzer.
+2. **Upload** one or multiple resumes (PDF/DOCX) one-by-one.
+3. **Analyze** and receive an instant breakdown of your match score, found technologies, and keyword gaps.
 
 ---
 
-## Key Features
+## ✨ Key Features
 
-- Multi-resume comparison for a single job description  
-- ATS-focused keyword extraction (skills, tools, frameworks, certifications)  
-- Client-side document parsing for privacy  
-- Serverless backend (no traditional server required)  
-- Lightweight React UI without a build step  
-
----
-
-## Tech Stack
-
-### Frontend
-- React 18 (CDN-based)
-- Babel Standalone
-- PDF.js
-- Mammoth.js
-
-### Backend
-- Node.js
-- Vercel Serverless Functions
-- Google Gemini 1.5 Flash (`@google/generative-ai`)
+* **Sequential Document Processing:** Seamlessly add multiple resumes to compare different versions of your profile.
+* **Intelligent Keyword Matching:** Beyond simple word-matching, the AI understands context and technical hierarchies.
+* **Actionable Insights:** Get specific AI recommendations on what to add to your resume to clear ATS filters.
+* **Modern SaaS Interface:** Built with a clean, responsive Glassmorphism design for a premium user experience.
 
 ---
 
-## Architecture Overview
+## 🛠️ Built With
 
-```text
-Browser
- ├── Resume Parsing (PDF.js / Mammoth.js)
- ├── React UI
- └── API Request
-        ↓
-Vercel Serverless Function
- ├── Gemini AI Analysis
- └── JSON Response
+This project leverages a modern, serverless architecture for speed and scalability:
+
+### Frontend (User Interface)
+
+* **React 18:** For a reactive, state-driven user experience.
+* **Tailwind CSS:** A utility-first CSS framework for professional styling.
+* **PDF.js & Mammoth.js:** Client-side libraries used to extract text from documents without needing a backend parser, ensuring user privacy.
+
+### Backend (AI Engine)
+
+* **Google Gemini 2.5 Flash:** The latest high-speed LLM used for complex technical cross-referencing and JSON data generation.
+* **Vercel Serverless Functions:** Node.js environment that handles secure communication with the AI engine.
+
+### Infrastructure
+
+* **Vercel:** Cloud hosting with automated CI/CD.
+* **GitHub:** Source control and repository management.
 
 ---
-## Project Structure
 
-├── api/
-│   └── analyze.js        # Serverless backend (AI logic)
-├── index.html            # Frontend UI and React logic
-├── package.json          # Backend dependencies
-├── .gitignore            # Prevents secrets from leaking
-└── README.md             # Project documentation
+## 🛡️ Privacy & Security
 
+Document parsing happens **locally in your browser**. Only the extracted text is sent to the secure serverless function for AI analysis. No files are stored permanently on our servers.
 
-## Local Setup
-Prerequisites
-Node.js 18+
-Vercel CLI
+---
 
+## 👤 Contact
 
-Create a .env file:
-GEMINI_API_KEY=YOUR_API_KEY_HERE
-Run locally:
-vercel dev
-Deployment
+Created by **Vineeth Petnakota** **Live Site:** [https://ai-resume-matcher-lovat.vercel.app](https://ai-resume-matcher-lovat.vercel.app)
 
-This project is deployed using Vercel.
-Import the repo into Vercel
-Add GEMINI_API_KEY under Environment Variables
-Deploy
+---
