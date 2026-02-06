@@ -5,20 +5,15 @@ module.exports = async (req, res) => {
 
   try {
     const { resumes, jobDescription } = req.body;
-    
-    if (!process.env.GEMINI_API_KEY) {
-        throw new Error("GEMINI_API_KEY is missing in Vercel settings.");
-    }
-
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const prompt = `Act as an ATS Scanner. Return ONLY a JSON object. No markdown. No preamble.
+    const prompt = `Act as an ATS Scanner. Return ONLY a JSON object. No Markdown. No conversation.
     {
       "detailed_analysis": [
         {
           "resume_name": "string",
-          "score": 0,
+          "score": number,
           "matching_technologies": [],
           "missing_keywords": [],
           "recommendation": "string"
@@ -29,17 +24,12 @@ module.exports = async (req, res) => {
     Resumes: ${JSON.stringify(resumes)}`;
 
     const result = await model.generateContent(prompt);
-    let text = result.response.text();
-    
-    // CLEANING: This removes any extra text Gemini adds like "Here is your JSON:"
+    const text = result.response.text();
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("AI did not return valid JSON");
     
-    const cleanData = JSON.parse(jsonMatch[0]);
-    res.status(200).json(cleanData);
-
+    if (!jsonMatch) throw new Error("AI failed to generate valid JSON");
+    res.status(200).json(JSON.parse(jsonMatch[0]));
   } catch (error) {
-    console.error("Vercel Function Error:", error);
     res.status(500).json({ error: error.message });
   }
 };
