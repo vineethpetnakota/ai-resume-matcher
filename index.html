@@ -40,10 +40,9 @@
         }
         .toggle-switch {
             box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-            border: 2px solid transparent;
         }
         .dark .toggle-switch {
-            border-color: #4f46e5;
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.2);
         }
     </style>
 </head>
@@ -81,7 +80,7 @@
                         const res = await mammoth.extractRawText({ arrayBuffer });
                         return res.value;
                     }
-                    return "Unsupported format";
+                    return "Error";
                 } catch (e) { return "Error"; }
             };
 
@@ -109,8 +108,7 @@
                         body: JSON.stringify({ 
                             resumes, 
                             jobDescription: jd,
-                            // Strictness Instruction
-                            instruction: "Use a deterministic 100-point scale. Hard Skills = 60%, Experience = 30%, Formatting = 10%. Scores must be consistent for identical content." 
+                            instruction: "Strict deterministic scoring: 60% skills, 40% experience. Results must be consistent."
                         })
                     });
                     const data = await res.json();
@@ -122,9 +120,10 @@
 
             return (
                 <div className={isDark ? "dark" : ""}>
-                    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+                    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300 pb-10">
                         
-                        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 sticky top-0 z-50 shadow-sm">
+                        {/* REVERTED HEADER: Back to the version you liked */}
+                        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 sticky top-0 z-50">
                             <div className="max-w-7xl mx-auto flex justify-between items-center">
                                 <div className="flex items-center gap-2">
                                     <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">
@@ -134,10 +133,10 @@
                                 </div>
                                 
                                 <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 hidden sm:block">{isDark ? "Dark Mode" : "Light Mode"}</span>
+                                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400">{isDark ? "Dark" : "Light"}</span>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" checked={isDark} onChange={() => setIsDark(!isDark)} className="sr-only peer" />
-                                        <div className="toggle-switch w-16 h-8 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-7 after:transition-all peer-checked:bg-indigo-600 flex items-center justify-between px-2 text-[12px]">
+                                        <div className="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600 flex items-center justify-between px-2 text-[12px]">
                                             <span>🌙</span>
                                             <span>☀️</span>
                                         </div>
@@ -154,8 +153,8 @@
                                         <h3 className="text-lg font-bold">Job Description</h3>
                                     </div>
                                     <textarea 
-                                        className="w-full h-48 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-400 outline-none transition-all text-slate-900 dark:text-white font-medium placeholder-slate-400"
-                                        placeholder="Paste target job requirements here..."
+                                        className="w-full h-48 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-400 outline-none transition-all text-slate-900 dark:text-white font-medium"
+                                        placeholder="Paste JD here..."
                                         value={jd}
                                         onChange={e => setJd(e.target.value)}
                                     />
@@ -167,21 +166,21 @@
                                         <h3 className="text-lg font-bold">Your Resumes</h3>
                                     </div>
                                     
-                                    {/* FIXED ENTIRE SECTION CLICKABLE */}
-                                    <label className="relative flex flex-col items-center justify-center w-full min-h-[160px] border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/10 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all overflow-hidden group">
-                                        <input type="file" multiple accept=".pdf,.docx" onChange={handleFiles} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                                        <div className="flex flex-col items-center pointer-events-none group-hover:scale-110 transition-transform">
-                                            <div className="text-5xl mb-3">📤</div>
-                                            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Drop files or click to upload</p>
-                                            <p className="text-[10px] mt-1 uppercase font-black opacity-50 tracking-widest">Multiple PDF/DOCX Supported</p>
+                                    {/* FIXED: Entire dashed area is now clickable */}
+                                    <div className="relative border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors">
+                                        <input type="file" multiple accept=".pdf,.docx" onChange={handleFiles} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+                                        <div className="p-8 text-center pointer-events-none">
+                                            <div className="text-4xl mb-2">📄</div>
+                                            <p className="text-sm font-bold opacity-80">Click to upload resumes</p>
+                                            <p className="text-[10px] mt-1 uppercase font-black opacity-50 tracking-widest">PDF or DOCX</p>
                                         </div>
-                                    </label>
+                                    </div>
 
-                                    <div className="mt-4 space-y-2 max-h-48 overflow-y-auto pr-1">
+                                    <div className="mt-4 space-y-2">
                                         {resumes.map(r => (
-                                            <div key={r.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm animate-in fade-in slide-in-from-top-1">
-                                                <span className="text-sm font-bold truncate pr-4">📄 {r.name}</span>
-                                                <button onClick={() => setResumes(prev => prev.filter(x => x.id !== r.id))} className="text-rose-500 hover:scale-125 font-black transition-all p-1">✕</button>
+                                            <div key={r.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                                                <span className="text-sm font-bold truncate pr-4">✅ {r.name}</span>
+                                                <button onClick={() => setResumes(prev => prev.filter(x => x.id !== r.id))} className="text-rose-500 hover:scale-125 font-black transition-all">✕</button>
                                             </div>
                                         ))}
                                     </div>
@@ -189,9 +188,9 @@
                                     <button 
                                         onClick={analyze}
                                         disabled={loading || !jd || resumes.length === 0}
-                                        className="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-black py-4 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-95"
+                                        className="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-black py-4 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 uppercase tracking-widest"
                                     >
-                                        {loading ? "⌛ Comparing..." : `Analyze ${resumes.length} Resume(s)`}
+                                        {loading ? "⌛ Analyzing..." : `Scan (${resumes.length}) Resumes`}
                                     </button>
                                 </section>
                             </div>
@@ -199,34 +198,34 @@
                             <div className="lg:col-span-7">
                                 {!results && !error && (
                                     <div className="h-full min-h-[400px] flex flex-col items-center justify-center border-4 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem] text-slate-400 p-10 text-center">
-                                        <div className="w-24 h-24 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center mb-6 text-5xl">📊</div>
-                                        <h3 className="text-xl font-bold mb-2">Awaiting Analysis</h3>
-                                        <p className="max-w-xs text-sm">Upload your resumes and add a JD to see the scoring breakdown.</p>
+                                        <div className="w-24 h-24 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center mb-6 text-5xl">🎯</div>
+                                        <h3 className="text-xl font-bold mb-2">Ready to optimize?</h3>
+                                        <p className="max-w-xs text-sm">Add a JD and resumes to see your match score.</p>
                                     </div>
                                 )}
 
                                 {error && (
-                                    <div className="bg-rose-50 dark:bg-rose-900/20 border-2 border-rose-200 dark:border-rose-800 p-6 rounded-3xl text-rose-700 dark:text-rose-300 font-bold mb-6">
+                                    <div className="bg-rose-50 dark:bg-rose-900/20 border-2 border-rose-200 dark:border-rose-800 p-6 rounded-3xl text-rose-700 dark:text-rose-400 font-bold mb-6">
                                         ⚠️ {error}
                                     </div>
                                 )}
 
                                 {results && (
                                     <div className="space-y-8 animate-in slide-in-from-bottom-5 duration-500">
-                                        <h2 className="text-3xl font-black mb-6">Optimization Report</h2>
+                                        <h2 className="text-3xl font-black mb-6">ATS Analysis Result</h2>
                                         {results.detailed_analysis.map((res, i) => (
-                                            <div key={i} className="glass-card rounded-[2.5rem] overflow-hidden border-t-8 border-t-indigo-600">
+                                            <div key={i} className="glass-card rounded-[2.5rem] overflow-hidden">
                                                 <div className="p-8">
                                                     <div className="flex justify-between items-start mb-8">
                                                         <h3 className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{res.resume_name}</h3>
-                                                        <div className={`text-5xl font-black ${res.score >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                                        <div className={`text-4xl font-black ${res.score >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
                                                             {res.score}%
                                                         </div>
                                                     </div>
 
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                                                         <div>
-                                                            <h4 className="text-[10px] font-black uppercase mb-3 tracking-[0.2em] opacity-60">Matches</h4>
+                                                            <h4 className="text-[10px] font-black uppercase mb-3 tracking-widest opacity-60">Matching Skills</h4>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {res.matching_technologies?.map((t,j) => (
                                                                     <span key={j} className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-bold border border-emerald-100 dark:border-emerald-800">{t}</span>
@@ -234,7 +233,7 @@
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <h4 className="text-[10px] font-black uppercase mb-3 tracking-[0.2em] opacity-60">Missing</h4>
+                                                            <h4 className="text-[10px] font-black uppercase mb-3 tracking-widest opacity-60">Missing Keywords</h4>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {res.missing_keywords?.map((t,j) => (
                                                                     <span key={j} className="px-3 py-1.5 bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 rounded-lg text-xs font-bold border border-rose-100 dark:border-rose-800">{t}</span>
@@ -243,9 +242,9 @@
                                                         </div>
                                                     </div>
 
-                                                    <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner">
-                                                        <p className="text-sm font-medium leading-relaxed opacity-90 italic">
-                                                            <span className="text-indigo-600 font-bold mr-2 not-italic uppercase text-[10px]">Advice:</span>
+                                                    <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+                                                        <p className="text-sm font-medium leading-relaxed italic opacity-90">
+                                                            <span className="text-indigo-600 font-bold mr-2 uppercase text-[10px] not-italic">AI Advice:</span>
                                                             {res.recommendation}
                                                         </p>
                                                     </div>
