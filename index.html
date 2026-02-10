@@ -3,26 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ResumeAI | Modern ATS Optimizer</title>
+    <title>ResumeAI | Premium ATS Analyzer</title>
+    
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .dark .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .bg-grid { background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
+        .dark .bg-grid { background-image: radial-gradient(#1e293b 1px, transparent 1px); }
+        body { transition: background-color 0.3s ease; }
     </style>
 </head>
-<body class="text-slate-900">
+<body class="bg-grid bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-200">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState } = React;
 
         function App() {
+            const [isDark, setIsDark] = useState(false);
             const [jd, setJd] = useState('');
             const [resumes, setResumes] = useState([]);
             const [loading, setLoading] = useState(false);
@@ -49,23 +69,21 @@
                         const res = await mammoth.extractRawText({ arrayBuffer });
                         return res.value;
                     }
-                    return "Unsupported format";
-                } catch (e) { return "Error reading file"; }
+                    return "Unsupported file type";
+                } catch (e) { return "Extraction Error"; }
             };
 
             const handleFiles = async (e) => {
                 const files = Array.from(e.target.files);
-                if (files.length === 0) return;
                 setLoading(true);
-                const newProcessed = await Promise.all(files.map(async f => ({
+                const newResumes = await Promise.all(files.map(async f => ({
                     id: Math.random().toString(36).substr(2, 9),
                     name: f.name,
                     content: await extractText(f)
                 })));
-                // Sequential Upload: Appending new files to the existing array
-                setResumes(prev => [...prev, ...newProcessed]);
+                setResumes(prev => [...prev, ...newResumes]);
                 setLoading(false);
-                e.target.value = ""; // Reset input
+                e.target.value = "";
             };
 
             const analyze = async () => {
@@ -78,89 +96,142 @@
                         body: JSON.stringify({ resumes, jobDescription: jd })
                     });
                     const data = await res.json();
-                    if (!res.ok) throw new Error(data.error || "Server error");
+                    if (!res.ok) throw new Error(data.error || "Analysis failed");
                     setResults(data);
                 } catch (err) { setError(err.message); }
                 setLoading(false);
             };
 
             return (
-                <div className="min-h-screen">
-                    <nav className="glass sticky top-0 z-50 px-6 py-4 mb-8 border-b border-slate-200">
-                        <div className="max-w-7xl mx-auto flex justify-between items-center">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">R</div>
-                                <span className="text-xl font-bold">Resume<span className="text-indigo-600">AI</span></span>
-                            </div>
-                        </div>
-                    </nav>
-
-                    <main className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
-                        <div className="lg:col-span-5 space-y-6">
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                                <h3 className="font-semibold mb-4 text-slate-700">1. Target Job Description</h3>
-                                <textarea className="w-full h-48 p-3 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm" 
-                                    placeholder="Paste requirements..." value={jd} onChange={e => setJd(e.target.value)} />
-                            </div>
-
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                                <h3 className="font-semibold mb-4 text-slate-700">2. Resumes ({resumes.length})</h3>
-                                <input type="file" multiple accept=".pdf,.docx" onChange={handleFiles} id="file-in" className="hidden" />
-                                <label htmlFor="file-in" className="block w-full border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer hover:bg-slate-50 transition-colors">
-                                    <span className="text-sm font-medium text-slate-600">Click to add resumes one-by-one</span>
-                                </label>
-
-                                <div className="mt-4 space-y-2 max-h-40 overflow-y-auto">
-                                    {resumes.map(r => (
-                                        <div key={r.id} className="flex items-center justify-between p-2 bg-slate-50 rounded border border-slate-100 text-xs">
-                                            <span className="truncate flex-1">📄 {r.name}</span>
-                                            <button onClick={() => setResumes(prev => prev.filter(x => x.id !== r.id))} className="text-rose-500 font-bold ml-2">✕</button>
-                                        </div>
-                                    ))}
+                <div className={isDark ? "dark" : ""}>
+                    <div className="min-h-screen transition-colors duration-500 pb-20">
+                        
+                        {/* Elegant Header */}
+                        <header className="glass sticky top-0 z-50 px-8 py-4 mb-12 border-b border-slate-200 dark:border-slate-800">
+                            <div className="max-w-7xl mx-auto flex justify-between items-center">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </div>
+                                    <span className="text-2xl font-bold tracking-tight dark:text-white">Resume<span className="text-indigo-500">AI</span></span>
                                 </div>
-
-                                <button onClick={analyze} disabled={loading || !jd || resumes.length === 0} 
-                                    className="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold py-3 rounded-xl shadow-lg transition-all">
-                                    {loading ? "Analyzing..." : "Run ATS Scan"}
+                                <button onClick={() => setIsDark(!isDark)} className="p-2.5 rounded-full glass hover:scale-110 transition-transform">
+                                    {isDark ? "☀️" : "🌙"}
                                 </button>
                             </div>
-                        </div>
+                        </header>
 
-                        <div className="lg:col-span-7">
-                            {!results && !error && <div className="h-64 flex items-center justify-center border-2 border-dashed border-slate-200 rounded-3xl text-slate-400">Results will appear here</div>}
-                            {error && <div className="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-xl text-sm">{error}</div>}
-                            {results && results.detailed_analysis && (
-                                <div className="space-y-6">
-                                    {results.detailed_analysis.map((res, i) => (
-                                        <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                                            <div className="flex justify-between items-center mb-4">
-                                                <h3 className="font-bold text-lg">{res.resume_name}</h3>
-                                                <div className={`px-3 py-1 rounded-full font-bold text-sm ${res.score >= 70 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                                                    {res.score}% Match
+                        <main className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-10">
+                            
+                            {/* Input Panel */}
+                            <div className="lg:col-span-5 space-y-8">
+                                <section className="glass p-6 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none">
+                                    <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-4">Target Job</h3>
+                                    <textarea 
+                                        className="w-full h-56 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none text-sm"
+                                        placeholder="Paste job description here..."
+                                        value={jd}
+                                        onChange={e => setJd(e.target.value)}
+                                    />
+                                </section>
+
+                                <section className="glass p-6 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Resumes</h3>
+                                        <span className="text-xs font-bold px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg">{resumes.length} Ready</span>
+                                    </div>
+                                    
+                                    <input type="file" multiple accept=".pdf,.docx" onChange={handleFiles} id="file-in" className="hidden" />
+                                    <label htmlFor="file-in" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors group">
+                                        <span className="text-2xl group-hover:scale-125 transition-transform">📄</span>
+                                        <span className="text-xs mt-2 font-medium text-slate-500">Upload one or more</span>
+                                    </label>
+
+                                    <div className="mt-4 space-y-2 overflow-y-auto max-h-48 pr-2">
+                                        {resumes.map(r => (
+                                            <div key={r.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-900/80 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm animate-in fade-in slide-in-from-left-2">
+                                                <span className="text-xs truncate font-medium">✅ {r.name}</span>
+                                                <button onClick={() => setResumes(prev => prev.filter(x => x.id !== r.id))} className="text-slate-400 hover:text-rose-500">✕</button>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <button 
+                                        onClick={analyze}
+                                        disabled={loading || !jd || resumes.length === 0}
+                                        className="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white font-bold py-4 rounded-2xl shadow-xl shadow-indigo-200 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-3"
+                                    >
+                                        {loading ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : "Compare & Match"}
+                                    </button>
+                                </section>
+                            </div>
+
+                            {/* Analysis Panel */}
+                            <div className="lg:col-span-7 space-y-6">
+                                {!results && !error && (
+                                    <div className="h-full min-h-[400px] flex flex-col items-center justify-center glass rounded-[2.5rem] text-slate-400 opacity-60">
+                                        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center mb-4 animate-pulse-slow text-3xl">🤖</div>
+                                        <p className="font-medium">Waiting for your input...</p>
+                                    </div>
+                                )}
+
+                                {error && (
+                                    <div className="p-6 bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900 rounded-3xl text-rose-600 dark:text-rose-400 flex items-center gap-3">
+                                        <span>⚠️</span> {error}
+                                    </div>
+                                )}
+
+                                {results && results.detailed_analysis && (
+                                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+                                        {results.detailed_analysis.map((res, i) => (
+                                            <div key={i} className="glass rounded-[2rem] overflow-hidden shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-200 dark:border-slate-800">
+                                                <div className="p-8">
+                                                    <div className="flex justify-between items-start mb-8">
+                                                        <div>
+                                                            <h3 className="text-2xl font-bold dark:text-white mb-1">{res.resume_name}</h3>
+                                                            <p className="text-sm text-slate-400">Match score generated by Gemini 2.5</p>
+                                                        </div>
+                                                        <div className={`text-3xl font-black ${res.score >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>
+                                                            {res.score}%
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                        <div className="space-y-4">
+                                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-500 px-3 py-1 bg-emerald-500/10 rounded-full w-fit">Matches</h4>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {res.matching_technologies?.map((t,j) => (
+                                                                    <span key={j} className="text-xs font-semibold px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">{t}</span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <div className="space-y-4">
+                                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-rose-500 px-3 py-1 bg-rose-500/10 rounded-full w-fit">Gaps</h4>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {res.missing_keywords?.map((t,j) => (
+                                                                    <span key={j} className="text-xs font-semibold px-3 py-1.5 bg-rose-50/50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-lg border border-rose-100 dark:border-rose-900/30">{t}</span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="px-8 py-6 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
+                                                    <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                                        <strong className="text-indigo-500 mr-2">Pro Recommendation:</strong>
+                                                        {res.recommendation}
+                                                    </p>
                                                 </div>
                                             </div>
-                                            <div className="grid grid-cols-2 gap-4 text-xs">
-                                                <div>
-                                                    <p className="font-bold text-slate-400 uppercase mb-2">Matched Tech</p>
-                                                    <div className="flex flex-wrap gap-1">{res.matching_technologies?.map((t,j)=><span key={j} className="bg-emerald-50 text-emerald-700 px-2 py-1 rounded">{t}</span>)}</div>
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-slate-400 uppercase mb-2">Missing</p>
-                                                    <div className="flex flex-wrap gap-1">{res.missing_keywords?.map((t,j)=><span key={j} className="bg-rose-50 text-rose-700 px-2 py-1 rounded">{t}</span>)}</div>
-                                                </div>
-                                            </div>
-                                            <div className="mt-4 p-4 bg-slate-50 rounded-lg text-xs leading-relaxed italic text-slate-600">
-                                                <strong>AI Advice:</strong> {res.recommendation}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </main>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </main>
+                    </div>
                 </div>
             );
         }
+
         ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
