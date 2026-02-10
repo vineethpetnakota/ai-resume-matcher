@@ -38,7 +38,13 @@
             border: 1px solid #1e293b; 
             box-shadow: none;
         }
-        .toggle-dot { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* Custom Toggle Styling */
+        .toggle-switch {
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+        .dark .toggle-switch {
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.2);
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
@@ -75,7 +81,7 @@
                         const res = await mammoth.extractRawText({ arrayBuffer });
                         return res.value;
                     }
-                    return "Unsupported file";
+                    return "Unsupported format";
                 } catch (e) { return "Error"; }
             };
 
@@ -113,7 +119,7 @@
                     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
                         
                         {/* Header */}
-                        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 sticky top-0 z-50">
+                        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 sticky top-0 z-50 shadow-sm">
                             <div className="max-w-7xl mx-auto flex justify-between items-center">
                                 <div className="flex items-center gap-2">
                                     <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">
@@ -122,14 +128,14 @@
                                     <span className="text-2xl font-extrabold tracking-tight">Resume<span className="text-indigo-600">AI</span></span>
                                 </div>
                                 
-                                {/* Professional Toggle Switch */}
+                                {/* Visible Toggle Switch */}
                                 <div className="flex items-center gap-3">
-                                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400">{isDark ? "Dark" : "Light"}</span>
-                                    <label className="relative inline-flex items-center cursor-pointer">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 hidden sm:block">Theme</span>
+                                    <label className="relative inline-flex items-center cursor-pointer group">
                                         <input type="checkbox" checked={isDark} onChange={() => setIsDark(!isDark)} className="sr-only peer" />
-                                        <div className="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600 flex items-center justify-between px-2 text-[12px]">
-                                            <span>🌙</span>
-                                            <span>☀️</span>
+                                        <div className="toggle-switch w-16 h-8 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-800 border-2 border-slate-300 dark:border-indigo-500/50 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-7 after:transition-all peer-checked:bg-indigo-600 flex items-center justify-between px-2 text-[12px] shadow-inner">
+                                            <span className="ml-0.5">☀️</span>
+                                            <span className="mr-0.5">🌙</span>
                                         </div>
                                     </label>
                                 </div>
@@ -137,25 +143,21 @@
                         </header>
 
                         <main className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-12 gap-8">
-                            
                             {/* Inputs Column */}
                             <div className="lg:col-span-5 space-y-8">
-                                
-                                {/* Step 1: JD */}
                                 <section className="glass-card p-6 rounded-3xl">
                                     <div className="flex items-center gap-3 mb-4">
                                         <span className="bg-indigo-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs font-black">1</span>
                                         <h3 className="text-lg font-bold">Job Description</h3>
                                     </div>
                                     <textarea 
-                                        className="w-full h-48 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-400 outline-none transition-all text-slate-900 dark:text-white font-medium placeholder-slate-400"
+                                        className="w-full h-48 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-400 outline-none transition-all text-slate-900 dark:text-white font-medium"
                                         placeholder="Paste target job requirements here..."
                                         value={jd}
                                         onChange={e => setJd(e.target.value)}
                                     />
                                 </section>
 
-                                {/* Step 2: Resumes */}
                                 <section className="glass-card p-6 rounded-3xl">
                                     <div className="flex items-center gap-3 mb-4">
                                         <span className="bg-indigo-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-xs font-black">2</span>
@@ -164,17 +166,16 @@
                                     
                                     <div className="relative group border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-8 text-center hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-colors">
                                         <input type="file" multiple accept=".pdf,.docx" onChange={handleFiles} className="absolute inset-0 opacity-0 cursor-pointer" />
-                                        <div className="text-4xl mb-2">📤</div>
+                                        <div className="text-4xl mb-2 opacity-80">📤</div>
                                         <p className="text-sm font-bold opacity-80">Click to upload resumes</p>
-                                        <p className="text-[10px] mt-1 uppercase font-black opacity-50">PDF or DOCX</p>
+                                        <p className="text-[10px] mt-1 uppercase font-black opacity-40 italic">PDF or DOCX</p>
                                     </div>
 
-                                    {/* Selected Files List */}
-                                    <div className="mt-4 space-y-2">
+                                    <div className="mt-4 space-y-2 max-h-48 overflow-y-auto">
                                         {resumes.map(r => (
-                                            <div key={r.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm animate-in fade-in slide-in-from-top-1">
+                                            <div key={r.id} className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:border-indigo-300">
                                                 <span className="text-sm font-bold truncate pr-4">📄 {r.name}</span>
-                                                <button onClick={() => setResumes(prev => prev.filter(x => x.id !== r.id))} className="text-rose-500 hover:scale-125 font-black transition-transform">✕</button>
+                                                <button onClick={() => setResumes(prev => prev.filter(x => x.id !== r.id))} className="text-rose-500 hover:scale-125 font-black transition-all">✕</button>
                                             </div>
                                         ))}
                                     </div>
@@ -182,7 +183,7 @@
                                     <button 
                                         onClick={analyze}
                                         disabled={loading || !jd || resumes.length === 0}
-                                        className="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-black py-4 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-[0.98]"
+                                        className="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-black py-4 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 uppercase tracking-widest active:scale-[0.97]"
                                     >
                                         {loading ? "⌛ Analyzing..." : `Scan ${resumes.length} Resume(s)`}
                                     </button>
@@ -192,10 +193,10 @@
                             {/* Results Column */}
                             <div className="lg:col-span-7">
                                 {!results && !error && (
-                                    <div className="h-full min-h-[400px] flex flex-col items-center justify-center border-4 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem] text-slate-400 p-10 text-center transition-all">
+                                    <div className="h-full min-h-[400px] flex flex-col items-center justify-center border-4 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem] text-slate-400 p-10 text-center">
                                         <div className="w-24 h-24 bg-slate-100 dark:bg-slate-900 rounded-full flex items-center justify-center mb-6 text-5xl">🎯</div>
                                         <h3 className="text-xl font-bold mb-2">Ready to optimize?</h3>
-                                        <p className="max-w-xs text-sm">Add a job description and your resumes to see your ATS score.</p>
+                                        <p className="max-w-xs text-sm">Upload your files to begin the ATS matching process.</p>
                                     </div>
                                 )}
 
@@ -207,9 +208,9 @@
 
                                 {results && (
                                     <div className="space-y-8 animate-in slide-in-from-bottom-5 duration-500">
-                                        <h2 className="text-3xl font-black mb-6">ATS Analysis Report</h2>
+                                        <h2 className="text-3xl font-black mb-6">Analysis Results</h2>
                                         {results.detailed_analysis.map((res, i) => (
-                                            <div key={i} className="glass-card rounded-[2.5rem] overflow-hidden border-t-4 border-t-indigo-600">
+                                            <div key={i} className="glass-card rounded-[2.5rem] overflow-hidden border-l-8 border-l-indigo-600">
                                                 <div className="p-8">
                                                     <div className="flex justify-between items-start mb-8">
                                                         <h3 className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{res.resume_name}</h3>
@@ -220,7 +221,7 @@
 
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                                                         <div>
-                                                            <h4 className="text-[10px] font-black uppercase mb-3 tracking-[0.2em] opacity-60">✅ Matching Skills</h4>
+                                                            <h4 className="text-[10px] font-black uppercase mb-3 tracking-[0.2em] opacity-60">✅ Matching</h4>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {res.matching_technologies?.map((t,j) => (
                                                                     <span key={j} className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-bold border border-emerald-100 dark:border-emerald-800">{t}</span>
@@ -228,7 +229,7 @@
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <h4 className="text-[10px] font-black uppercase mb-3 tracking-[0.2em] opacity-60">❌ Gaps Found</h4>
+                                                            <h4 className="text-[10px] font-black uppercase mb-3 tracking-[0.2em] opacity-60">❌ Gaps</h4>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {res.missing_keywords?.map((t,j) => (
                                                                     <span key={j} className="px-3 py-1.5 bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 rounded-lg text-xs font-bold border border-rose-100 dark:border-rose-800">{t}</span>
@@ -238,8 +239,8 @@
                                                     </div>
 
                                                     <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                                        <p className="text-sm font-medium leading-relaxed italic opacity-90">
-                                                            <span className="text-indigo-600 font-bold mr-2">AI Advice:</span>
+                                                        <p className="text-sm font-medium leading-relaxed opacity-90 italic">
+                                                            <span className="text-indigo-600 font-bold mr-2 uppercase text-[10px] not-italic">AI Recommendation:</span>
                                                             {res.recommendation}
                                                         </p>
                                                     </div>
